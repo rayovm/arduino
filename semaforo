@@ -1,0 +1,141 @@
+
+#define P1 1 //semaforo peatonal 1
+#define P2 2 //semaforo peatonal 2
+#define V1 3 //semaforo vial 1
+#define V2 4 //semaforo vial 2
+
+#define RED_TO_GREEN 1 //transicion rojo a verde
+#define GREEN_TO_RED 2 //transicion verde a rojo
+
+/*Secuencia de ledes "Auto incríble. La secuencia se ejecuta de izquierda a derecha y viceversa"*/
+int v1r = 2;    // Asignación de salida en el pin 2.   
+int v1y = 3;    // Asignación de salida en el pin 3.
+int v1g = 4;    // Asignación de salida en el pin 4.
+int p1r = 5;    // Asignación de salida en el pin 5.
+int p1g = 6;    // Asignación de salida en el pin 6.
+
+int v2r = 7;    // Asignación de salida en el pin 7.
+int v2y = 8;    // Asignación de salida en el pin 8.
+int v2g = 9;    // Asignación de salida en el pin 9.
+int p2r = 10;    // Asignación de salida en el pin 10.
+int p2g = 11;    // Asignación de salida en el pin 11.
+
+void setup() {
+  // Declaración de los pines como SALIDA.
+  pinMode (v1r, OUTPUT);       
+  pinMode (v1y, OUTPUT);       
+  pinMode (v1g, OUTPUT);       
+  pinMode (p1r, OUTPUT);       
+  pinMode (p1g, OUTPUT);
+
+  pinMode (v2r, OUTPUT);       
+  pinMode (v2y, OUTPUT);       
+  pinMode (v2g, OUTPUT);       
+  pinMode (p2r, OUTPUT);       
+  pinMode (p2g, OUTPUT);   
+}
+void loop() {
+  //Establecer un estado inicial de los semáforos
+  // SEMAFORO VIAL V1 EN VERDE
+  digitalWrite (v1r, LOW);   
+  digitalWrite (v1y, LOW);
+  digitalWrite (v1g, HIGH);  
+  // SEMAFORO PEATONAL P1 EN ROJO 
+  digitalWrite (p1r, HIGH);
+  digitalWrite (p1g, LOW);
+  // SEMAFORO VIAL V2 EN VERDE   
+  digitalWrite (v2r, LOW);
+  digitalWrite (v2y, LOW);
+  //SEMAFORO PEATONAL P2 EN ROJO   
+  digitalWrite (v2g, HIGH);
+  digitalWrite (p2r, HIGH);   
+  digitalWrite (p2g, LOW);
+  delay (1000);
+
+  //Iniciar el bucle infinito
+  iniciarSemaforos();      
+  
+}
+
+void iniciarSemaforos() {
+  while (true){ //bucle infinito
+    // TRANSICION DEL SEMAFORO PEATONAL P1 A VERDE
+    cambiaSemaforo(V1, GREEN_TO_RED);
+    cambiaSemaforo(P1, RED_TO_GREEN);
+    delay (9000);
+    
+    // TRANSICION DEL SEMAFORO VIAL V1 A VERDE
+    cambiaSemaforo(V1, RED_TO_GREEN);
+    cambiaSemaforo(P1, GREEN_TO_RED);
+    delay (9000);    
+  } 
+}
+
+void cambiaSemaforo (int semaforo, int transicion) {
+  if (semaforo == P1 || semaforo == P2) {
+    cambiaSemaforoPeatonal(semaforo, transicion);
+  } else {
+    cambiaSemaforoVial(semaforo, transicion);
+  }
+}
+
+void cambiaSemaforoPeatonal (int semaforo, int transicion) {
+  int luzverde = p1g;
+  int luzroja = p1r;
+
+  switch (semaforo)
+  {
+    case P2:
+        luzverde = p2g;
+        luzroja = p2r;
+        break;
+    default:
+        luzverde = p1g;
+        luzroja = p1r;
+        break;
+  }
+
+  if (transicion == RED_TO_GREEN) {
+    delay(2000);
+    digitalWrite (luzverde, HIGH);   
+    digitalWrite (luzroja, LOW);
+  } else if (transicion == GREEN_TO_RED) {
+    digitalWrite (luzverde, LOW);   
+    digitalWrite (luzroja, HIGH);
+  }
+
+}
+
+void cambiaSemaforoVial (int semaforo, int transicion) {
+  int luzverde = v1g;
+  int luzamarilla = v1y;
+  int luzroja = v1r;
+
+  switch (semaforo)
+  {
+    case V2:
+        luzverde = v2g;
+        luzamarilla = v2y;
+        luzroja = v2r;
+        break;
+    default:
+        luzverde = v1g;
+        luzamarilla = v1y;
+        luzroja = v1r;
+        break;
+  }
+
+  if (transicion == RED_TO_GREEN) {
+    delay(2000);
+    digitalWrite (luzverde, HIGH);   
+    digitalWrite (luzroja, LOW);
+  } else if (transicion == GREEN_TO_RED) {
+    digitalWrite (luzverde, LOW);
+    for (int i=0; i <= 10; i ++){
+      digitalWrite (luzamarilla, (i % 2 == 0) ? LOW : HIGH);
+      delay(200); 
+    }
+    digitalWrite (luzamarilla, LOW);
+    digitalWrite (luzroja, HIGH);
+  }
+}
